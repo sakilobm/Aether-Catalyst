@@ -1,61 +1,49 @@
 <?php
 
 /**
- * Framework Core Loader
- * =====================
- * Every PHP page starts with: require_once 'libs/load.php';
- * This file bootstraps all classes, reads config.json, and initiates the session.
+ * Modern Framework Loader (PSR-4)
+ * ===============================
+ * Bootstraps the framework using Composer autoloader.
  */
 
-// Load Composer autoloader (Carbon, php-amqplib, etc.)
-if (file_exists(__DIR__ . '/vendor/autoload.php')) {
-    require __DIR__ . '/vendor/autoload.php';
-}
+// Load Composer autoloader (PSR-4 + Dependencies)
+$loader = require_once __DIR__ . '/../vendor/autoload.php';
 
-// Load all framework classes in dependency order
-$_fwIncludes = [
-    'includes/Database.class.php',
-    'includes/Session.class.php',
-    'includes/User.class.php',
-    'includes/UserSession.class.php',
-    'includes/REST.class.php',
-    'includes/API.class.php',
-    'includes/WebAPI.class.php',
-];
-
-foreach ($_fwIncludes as $_fwFile) {
-    include_once __DIR__ . '/' . $_fwFile;
-}
-
-// Auto-load all app-level classes from libs/app/
-foreach (glob(__DIR__ . '/app/*.php') as $_appFile) {
-    include_once $_appFile;
-}
-
+// Global config singleton (Legacy support)
 global $__site_config;
 
-// Bootstrap: read config, connect DB, initiate session
+// Bootstrap: Initialize WebAPI (Loads .env, validates, connects DB, initiates session)
+use Aether\WebAPI;
+
 $wapi = new WebAPI();
 $wapi->initiateSession();
 
 /**
- * Reads a value from config.json (credentials are NEVER hardcoded).
+ * Universal config reader – Checks .env first, then config.json.
  *
- * @param string $key     The key to read from config.json
- * @param mixed  $default Default value if key not found
+ * @param string $key     The key to read (can be ENV_CONSTANT or json_key)
+ * @param mixed  $default Default value if not found
  * @return mixed
  */
 function get_config(string $key, $default = null)
 {
+    // 1. Try Environment Variables
+    $envValue = $_ENV[strtoupper($key)] ?? $_SERVER[strtoupper($key)] ?? false;
+    if ($envValue !== false) return $envValue;
+
+    // 2. Try global config JSON string ($__site_config)
     global $__site_config;
-    $array = json_decode($__site_config, true);
-    return isset($array[$key]) ? $array[$key] : $default;
+    if (!empty($__site_config)) {
+        $array = json_decode($__site_config, true);
+        if (isset($array[$key])) return $array[$key];
+    }
+
+    return $default;
 }
 
 /**
- * Direct include helper (use Session::loadTemplate() for data injection).
- *
- * @param string $name Template path relative to _templates/ (no .php)
+ * Direct include helper for small partials.
+ * For full views, use Aether\Session::renderView().
  */
 function load_template(string $name): void
 {

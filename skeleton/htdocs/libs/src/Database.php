@@ -1,10 +1,15 @@
 <?php
 
+namespace Aether;
+
+use PDO;
+use PDOException;
+use PDOStatement;
+
 /**
  * Advanced Database Class (Aether Core)
  * =====================================
- * Refactored to use PDO (PHP Data Objects) for security and multi-driver support.
- * Implements a fluent result wrapper and automatic prepared statement handling.
+ * PSR-4 Namespace: Aether\Database
  */
 class Database
 {
@@ -16,7 +21,6 @@ class Database
 
     /**
      * Get established PDO connection.
-     * Reads from .env (via get_config() fallback).
      *
      * @return PDO
      */
@@ -66,7 +70,6 @@ class Database
 
 /**
  * DatabaseResult Wrapper
- * Facilitates fluent chains like: Database::query($sql)->fetchAll()
  */
 class DatabaseResult
 {
@@ -77,25 +80,21 @@ class DatabaseResult
         $this->stmt = $stmt;
     }
 
-    /** @return array|false */
     public function fetch()
     {
         return $this->stmt->fetch();
     }
 
-    /** @return array */
     public function fetchAll(): array
     {
         return $this->stmt->fetchAll();
     }
 
-    /** @return int Number of affected rows */
     public function rowCount(): int
     {
         return $this->stmt->rowCount();
     }
 
-    /** @return string|int Last insert ID */
     public function lastInsertId()
     {
         return Database::getConnection()->lastInsertId();

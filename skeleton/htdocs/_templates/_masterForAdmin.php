@@ -1,3 +1,4 @@
+<?php use Aether\Session; ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -28,17 +29,21 @@
             </div>
         </nav>
 
-        <!-- Page Content -->
+        <!-- Page Content: Buffered inheritance content injected here -->
         <div class="content">
             <?php
-            $page = Session::getCurrentPageIdentifier();
-            Session::loadTemplate('admin/' . $page, ['user' => Session::getUser()]);
+            if (isset($content)) {
+                echo $content;
+            } else {
+                // Fallback for non-inheritance legacy calls
+                $page = Session::getCurrentPageIdentifier();
+                Session::loadTemplate('admin/' . $page, ['user' => Session::getUser()]);
+            }
             ?>
         </div>
 
     </div><!-- /.main-panel -->
 
-    <!-- Toast Notification Container -->
     <?php Session::loadTemplate('admin/_toastv3'); ?>
 
     <!-- Scripts -->

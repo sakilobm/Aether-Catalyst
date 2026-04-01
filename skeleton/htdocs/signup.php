@@ -1,1 +1,5 @@
-<?php require_once 'libs/load.php'; Session::renderPageRegister(); ?>
+<?php
+require_once 'libs/load.php';
+use Aether\Session;
+Session::renderPageRegister();
+?>

@@ -1,3 +1,4 @@
+<?php use Aether\Session; ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -12,9 +13,12 @@
 
     <main id="main-content">
         <?php
-        if (Session::$isError) {
-            Session::loadTemplate('core/_error');
+        // Advanced Template Inheritance:
+        // Individual views are buffered and injected here as $content.
+        if (isset($content)) {
+            echo $content;
         } else {
+            // Fallback for non-inheritance legacy calls
             Session::loadTemplate(Session::currentScript());
         }
         ?>
@@ -25,16 +29,7 @@
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <!-- GSAP for Ball cursor -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- FingerprintJS for session binding -->
-    <script type="module">
-        import FingerprintJS from 'https://openfpcdn.io/fingerprintjs/v3';
-        const fp = await FingerprintJS.load();
-        const result = await fp.get();
-        document.cookie = `fingerprint=${result.visitorId}; path=/; SameSite=None; Secure`;
-    </script>
-    <!-- Framework JS -->
     <script src="<?= get_config('base_path') ?>assets/js/toastv3.js"></script>
     <script src="<?= get_config('base_path') ?>assets/js/ball.js"></script>
     <script src="<?= get_config('base_path') ?>assets/js/apis.js"></script>

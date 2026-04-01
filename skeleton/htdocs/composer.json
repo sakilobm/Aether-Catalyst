@@ -1,6 +1,17 @@
 {
+    "name": "aether/app",
+    "description": "Custom PHP Framework App",
+    "type": "project",
     "require": {
+        "php": ">=8.1",
         "nesbot/carbon": "^2.63",
-        "php-amqplib/php-amqplib": "^3.5"
+        "php-amqplib/php-amqplib": "^3.5",
+        "vlucas/phpdotenv": "^5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Aether\\": "libs/src/",
+            "App\\": "libs/app/"
+        }
     }
 }
