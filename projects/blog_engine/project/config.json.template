@@ -1,0 +1,22 @@
+{
+    "_comment": "This file is in .gitignore — NEVER commit it. Copy to config.json and fill in your values.",
+
+    "db_server":    "localhost",
+    "db_username":  "root",
+    "db_password":  "",
+    "db_name":      "my_project",
+
+    "base_path":    "/my_project/htdocs/",
+    "upload_path":  "/var/www/uploads/",
+    "upload_path_pdf": "/var/www/uploads/pdf/",
+
+    "project_title": "My Project",
+    "meta_description": "A web application built on the Custom PHP Framework.",
+    "meta_author": "Your Name",
+
+    "rabbitmq_host":  "localhost",
+    "rabbitmq_port":  "5672",
+    "rabbitmq_user":  "guest",
+    "rabbitmq_pass":  "guest",
+    "rabbitmq_vhost": "/"
+}

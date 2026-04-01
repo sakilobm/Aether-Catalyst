@@ -1,0 +1,33 @@
+<FilesMatch "\.(ico|pdf|jpg|jpeg|png|webp|gif|html|htm|xml|txt|xsl|css|woff2|woff|ttf)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+
+ErrorDocument 404 /error.php
+ErrorDocument 500 /error.php
+
+RewriteEngine On
+RewriteBase /
+
+# --- Static asset pass-through ---
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# --- File server: /files/{filename} → files.php?name={filename} ---
+RewriteRule ^/?files/([^/]+)?$ files.php?name=$1 [L,QSA,NC]
+
+# --- API routing (namespace + method): /api/{namespace}/{method} ---
+RewriteRule ^/?api/([^/]+)/(.+)?$ api.php?rquest=$2&namespace=$1 [L,QSA,NC]
+
+# --- API routing (method only): /api/{method} ---
+RewriteRule ^/?api/([^/]+)?$ api.php?rquest=$1 [L,QSA,NC]
+
+# --- Clean URL: /pagename → pagename.php (if the .php file exists) ---
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^/.]+)$ $1.php [L]
+
+# --- Post slug routing: /post/{slug} → posts.php?slug={slug} ---
+RewriteRule ^/?post/([^/]+)/?$ posts.php?slug=$1 [L,QSA,NC]
+
+# --- Category routing: /category/{slug} ---
+RewriteRule ^/?category/([^/]+)/?$ category.php?slug=$1 [L,QSA,NC]
