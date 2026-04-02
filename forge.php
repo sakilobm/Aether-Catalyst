@@ -4,9 +4,10 @@
  * ╔══════════════════════════════════════════════════════════════════════╗
  * ║        Aether Catalyst — Project Automation & Blueprinting           ║
  * ║──────────────────────────────────────────────────────────────────────║
- * ║  Usage: php forge.php [command] [name]                               ║
+ * ║  Usage: php forge.php [command|title] [name|location]             ║
  * ║  Commands:                                                           ║
  * ║    (none)           Interactive project setup                        ║
+ * ║    [title] [path]   Quick setup with custom title and path           ║
  * ║    make:controller   Generate a new API controller closure           ║
  * ║    make:model        Generate a new ORM class (libs/app/)            ║
  * ║    make:env          Create .env and config.json from template       ║
@@ -40,18 +41,38 @@ if ($command) {
     }
 }
 
-// ─── Standard Forge (Interactive Setup) ───────────────────────────────────────
-
+// ─── Project Configuration ────────────────────────────────────────────────
 echo "\033[36m" . "Aether Catalyst — Evolutionary Framework Forge\n" . "\033[0m";
 
-$title = ask('Project Title', 'New Project');
-$slug  = slugify($title);
+// Determine Title (Arg1 or Prompt)
+if ($command && !str_starts_with($command, 'make:')) {
+    $title = $command;
+    echo "  Project Title: $title (via argument)\n";
+} else {
+    $title = ask('Project Title', 'New Project');
+}
+
+$slug = slugify($title);
+
+// Determine Location (Arg2 or Prompt)
+$defaultLocation = __DIR__ . '/projects/' . $slug;
+if ($arg1 && !str_starts_with($command, 'make:')) {
+    $target = $arg1;
+    echo "  Project Location: $target (via argument)\n";
+} else {
+    $target = ask('Project Location', $defaultLocation);
+}
+
+// Ensure the path is absolute for reliability
+if (!str_starts_with($target, '/') && !preg_match('/^[a-zA-Z]:\\\\/', $target)) {
+    $target = getcwd() . DIRECTORY_SEPARATOR . $target;
+}
+
+if (is_dir($target)) die("Project already exists at $target\n");
+
 $user  = ask('Database User', 'root');
 $pass  = askSecret('Database Pass');
 $db    = ask('Database Name', $slug);
-
-$target = __DIR__ . '/projects/' . $slug;
-if (is_dir($target)) die("Project already exists at $target\n");
 
 // 1. Scaffold
 @mkdir($target, 0755, true);
@@ -131,6 +152,28 @@ PHP;
     if (file_put_contents($path, $stub)) {
         echo "Created Model: $path\n";
     }
+}
+
+/** Generate environment files for existing project */
+function generateEnv(): void
+{
+    $title = ask('Project Title', 'New Project');
+    $user  = ask('Database User', 'root');
+    $pass  = askSecret('Database Pass');
+    $slug  = slugify($title);
+    $db    = ask('Database Name', $slug);
+
+    $config = [
+        'db_server' => 'localhost',
+        'db_username' => $user,
+        'db_password' => $pass,
+        'db_name' => $db,
+        'project_title' => $title,
+        'base_path' => "/$slug/htdocs/",
+    ];
+    file_put_contents('project/config.json', json_encode($config, JSON_PRETTY_PRINT));
+    file_put_contents('.env', "DB_HOST=localhost\nDB_USER=$user\nDB_PASS=$pass\nDB_NAME=$db\n");
+    echo "Generated .env and project/config.json\n";
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

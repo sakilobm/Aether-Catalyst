@@ -65,19 +65,38 @@ graph TD
 
 ## 🏗️ Generating a New Project
 
-The `forge.php` script is your primary tool for scaffolding. It handles directory creation, configuration, and database initialization.
+The `forge.php` script is your primary tool for scaffolding. It handles directory creation, configuration, and database initialization. You can now create projects in **any directory** on your system.
 
 ```bash
+# Interactive Mode
 php forge.php
+
+# Quick Setup
+php forge.php "Nebula CMS" ./my-projects/nebula
 ```
 
 ### What happens during Forge?
 
 1.  **Identity:** Define your project title (e.g., "Nebula CMS").
-2.  **Database:** Input your MySQL credentials. Forge creates the DB and runs `base.sql`.
-3.  **Paths:** Set your `base_path` (e.g., `/nebula/htdocs/`).
-4.  **Scaffolding:** Copies the clean skeleton into `projects/{slug}/`.
-5.  **Intelligence:** Generates `AI_PROMPT.md` inside your new project folder.
+2.  **Location:** Choose where to create the project (Default: `projects/{slug}`).
+3.  **Database:** Input your MySQL credentials. Forge creates the DB and runs `base.sql`.
+4.  **Paths:** Set your `base_path` (e.g., `/nebula/htdocs/`).
+5.  **Scaffolding:** Copies the clean skeleton into your target directory.
+6.  **Intelligence:** Generates `AI_PROMPT.md` inside your new project folder.
+
+---
+
+## 🛠️ Catalyst CLI Commands
+
+Forge isn't just for setup; it also helps you build your application:
+
+| Command | Description |
+| :--- | :--- |
+| `php forge.php` | Start interactive project setup |
+| `php forge.php [title] [path]` | Quick project creation with custom title and location |
+| `php forge.php make:controller [name]` | Generate a new closure-based API endpoint |
+| `php forge.php make:model [name]` | Generate a new ORM class with `SQLGetterSetter` |
+| `php forge.php make:env` | Regenerate `.env` and `config.json` for an existing project |
 
 ---
 
